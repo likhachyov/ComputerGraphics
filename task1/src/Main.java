@@ -22,7 +22,7 @@ public class Main {
         p.setPreferredSize(new Dimension(width, height));
         p.setBackgroundColor(Color.black);
         p.addObj(new Sun(200, 200, 50, 20, 25, Color.orange, Color.orange));
-//        p.addObj(new Jeep());
+        p.addObj(new Jeep(350, 450, 500, 300, Color.green));
         return p;
     }
 }
