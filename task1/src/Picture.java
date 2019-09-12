@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 public class Picture extends JPanel {
 
+    public Color getBackgroundColor() {
+        return backgroundColor;
+    }
+
     private Color backgroundColor;
 
     private ArrayList<PicObject> objs;
