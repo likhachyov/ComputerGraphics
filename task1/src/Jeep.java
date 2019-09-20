@@ -43,6 +43,23 @@ public class Jeep implements PicObject {
         drawAwning(g2, startXAwning, startYAwning, Color.cyan);
         drawSpareWheel(g2, startXAwning,startYAwning,(int)(0.08*width), (int)wheelDiameter, tireColor);
         drawHeadLamp(g2,lampCenterLeftX, lampCenterLeftY,(int) (0.02*width), (int)(0.1*hullHeight), lampColor);
+        drawTexts(g2);
+    }
+
+    private void drawTexts(Graphics2D g2) {
+        Font font = g2.getFont();
+        g2.setFont(font.deriveFont(Font.BOLD, 16f));
+        g2.drawString("Sun", 100, 100);
+        g2.setFont(font.deriveFont(Font.PLAIN, 16f));
+        g2.setColor(Color.BLUE);
+
+        byte[] data = new byte[]{'I', 't','\'','s',' ', 'a', ' ', 'b','a','c','k','g','r','o','u','n','d'};
+        g2.drawBytes(data, 0, data.length, 700, 200);
+        font = font.deriveFont(Font.ITALIC, 20f);
+        g2.setFont(font);
+        char[] chars = new char[]{'C','o','m','p','u','t','e','r','G','r','a','p','h','i','c','s'};
+        g2.setColor(Color.RED);
+        g2.drawChars(chars,0,chars.length, 700, 600);
     }
 
     private void drawHeadLamp(Graphics2D g2, int lampCenterLeftX, int lampCenterLeftY, int width, int height, Color lampColor) {
@@ -230,6 +247,8 @@ public class Jeep implements PicObject {
         int n = 0;
         int[] xPoints = new int[nPoints];
         int[] yPoints = new int[nPoints];
+
+        //double dx[] = new {0.365, 0, 0.2, 0.7, 0.7}
         xPoints[n] = x;
         yPoints[n] = y;
         ++n;

@@ -14,7 +14,6 @@ public class Main {
         frame.add(p);
         frame.pack();
         frame.setLocationRelativeTo(null);
-
     }
 
     private static Picture initPicture(int width, int height) {
