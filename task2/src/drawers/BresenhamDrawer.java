@@ -29,19 +29,21 @@ public class BresenhamDrawer implements LineDrawer, OvalDrawer {
         }
     }
 
+    // Закрашиваемый пай включает в себя построение незакрашиваемого.
     public void fillPie(PixelDrawer pl, int x0, int y0, int width, int height, int from, int to, Color color) {
         if (from > to || from < 0 || to > 360)
             throw new IllegalArgumentException();
         if (from <= 90)
             fillPieMod(pl, x0, y0, width, height, from, Math.min(90, to), color);
-        if (from <= 180 && to > 90)
-            fillPieMod2(pl, x0, y0, width, height, to > 180 ? 0 : 90 - to, from > 90 ? 180 - from : 90, color);
+        if (from <= 180 && to > 90){
+            int trueTo =from > 90 ? 180 - from : 90;
+            fillPieMod2(pl, x0, y0, width, height, to >= 180 ? 0 : trueTo-to%90, trueTo, color);
+        }
         if (from <= 270 && to > 180)
             fillPieMod3(pl, x0, y0, width, height, from > 180 ? from - 180 : 0, to < 270 ? to - 180 : 90, color);
         if (to > 270)
             fillPieMod4(pl, x0, y0, width, height, to < 360 ? 90 - to % 90 : 0, from <= 270 ? 90 : 90 - from % 90, color);
     }
-
 
     /**
      * Для первой четверти

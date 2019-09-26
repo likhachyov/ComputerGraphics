@@ -19,7 +19,7 @@ public class GraphicsPixelDrawer implements PixelDrawer {
     }
 
     @Override
-    public void drawPixel(int x, int y, Color c, float transparency) {
+    public void drawPixel(int x, int y, Color c, int transparency) {
         g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), transparency));
         g.drawLine(x, y, x, y);
     }

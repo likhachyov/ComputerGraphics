@@ -6,5 +6,5 @@ public interface PixelDrawer {
 
     void drawPixel(int x, int y, Color c);
 
-    void drawPixel(int x, int y, Color c, float transparency);
+    void drawPixel(int x, int y, Color c, int transparency);
 }
