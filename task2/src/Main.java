@@ -4,9 +4,9 @@ import java.awt.*;
 public class Main {
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Task 1");
+        JFrame frame = new JFrame("Task 2");
         frame.setVisible(true);
-        frame.setResizable(false);
+//        frame.setResizable(false);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         DrawPanel p = initPicture(500, 500);

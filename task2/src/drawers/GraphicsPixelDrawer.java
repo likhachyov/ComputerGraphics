@@ -1,3 +1,7 @@
+package drawers;
+
+import Interfaces.PixelDrawer;
+
 import java.awt.*;
 
 public class GraphicsPixelDrawer implements PixelDrawer {
@@ -11,6 +15,12 @@ public class GraphicsPixelDrawer implements PixelDrawer {
     @Override
     public void drawPixel(int x, int y, Color c) {
         g.setColor(c);
+        g.drawLine(x, y, x, y);
+    }
+
+    @Override
+    public void drawPixel(int x, int y, Color c, float transparency) {
+        g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), transparency));
         g.drawLine(x, y, x, y);
     }
 }
