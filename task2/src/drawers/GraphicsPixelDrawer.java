@@ -42,9 +42,9 @@ public class GraphicsPixelDrawer implements PixelDrawer {
     }
 
     @Override
-    public void drawPixels(Stack<WuDrawer.Point> s) {
-        WuDrawer.Point p;
-        while (!s.empty()) {
+    public void drawPixels(Stack<Ellipse.Point> s) {
+        Ellipse.Point p;
+        while (!s.empty()) { // foreEach почему-то достаёт элементы из стэка по принципу очереди
             p = s.pop();
             if (p.ell.isRange(p.x, p.y, true))
                 drawPixel(p.ell.getX0() + p.x, p.ell.getY0() + p.y, p.ell.getColor(), p.alpha);
@@ -52,10 +52,13 @@ public class GraphicsPixelDrawer implements PixelDrawer {
     }
 
     @Override
-    public void drawPixels(Queue<WuDrawer.Point> q) {
-        q.forEach(p -> {
-            if (p.ell.isRange(p.x, p.y, true)) drawPixel(p.ell.getX0() + p.x, p.ell.getY0() + p.y, p.ell.getColor(), p.alpha);
-        });
+    public void drawPixels(Queue<Ellipse.Point> q) {
+        Ellipse.Point p;
+        while (!q.isEmpty()) {
+            p = q.poll();
+            if (p.ell.isRange(p.x, p.y, true))
+                drawPixel(p.ell.getX0() + p.x, p.ell.getY0() + p.y, p.ell.getColor(), p.alpha);
+        }
     }
 
 }

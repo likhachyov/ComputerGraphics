@@ -1,17 +1,15 @@
 package drawers;
 
-import Interfaces.LineDrawer;
-import Interfaces.OvalDrawer;
 import Interfaces.PixelDrawer;
 
 import java.awt.*;
-import java.util.PriorityQueue;
-import java.util.Stack;
+import java.util.*;
 
-public class WuDrawer extends BresenhamDrawer {
+public class WuDrawer {
 
-    @Override
-    public void drawLine(PixelDrawer pd, int x1, int y1, int x2, int y2, Color c) {
+
+    private ArrayList<Ellipse.Point> drawLine(PixelDrawer pd, int x1, int y1, int x2, int y2, Color c) {
+        ArrayList<Ellipse.Point> contour = new ArrayList<>();
         int x = x1;
         int y = y1;
         double dx = Math.abs(x2 - x1);
@@ -23,8 +21,10 @@ public class WuDrawer extends BresenhamDrawer {
         int secondY = y + directionY;
         int secondX = x + directionX;
         for (int i = 0; i < (tangent <= 1 ? dx : dy); i++) {
-            if (i == 0)
+            if (i == 0){
                 pd.drawPixel(x, y, c); // красим первый пиксель
+                contour.add(new Ellipse.Point(x, y));
+            }
             if (tangent <= 1) {
                 x += directionX;
                 error += tangent;
@@ -47,47 +47,33 @@ public class WuDrawer extends BresenhamDrawer {
                 pd.drawPixel(x, y, c, (int) (255 * (1 - error))); // основную точку рисуем с прозрачностью 1- error
                 pd.drawPixel(secondX, y, c, (int) (255 * error));// вторую с прозрачностью равной error
             }
+            contour.add(new Ellipse.Point(x, y));
         }
+        return contour;
     }
 
-    public class Point implements Comparable{
-        int x, y, alpha;
-        Ellipse ell;
 
-        public Point(Ellipse ell, int x, int y, int alpha) {
-            this.x = x;
-            this.y = y;
-            this.alpha = alpha;
-            this.ell = ell;
-        }
 
-        @Override
-        public int compareTo(Object o) {
-            return 0;
-        }
-    }
-
-    public void quadrant2(PixelDrawer pd, int x0, int y0, int a, int b, int from, int to, Color color) {
+    public void drawPie(PixelDrawer pd, int x0, int y0, int a, int b, int from, int to, Color color, boolean fill) {
         Ellipse ell = new Ellipse(x0, y0, a, b, from, to, color);
-        PriorityQueue<Point> q4 = new PriorityQueue<>();
-        PriorityQueue<Point> q2 = new PriorityQueue<>();
-        Stack<Point> q1 = new Stack<>();
-        Stack<Point> q3 = new Stack<>();
-        // координаты данной фигуры при ее построении с центром в начале координат
+
+        Queue<Ellipse.Point> q2 = new ArrayDeque<>(); // коллекция для каждой четверти
+        Queue<Ellipse.Point> q4 = new ArrayDeque<>(); // эллипс начинает рисоваться в 4-й четверти (в координатах экрана)
+        Stack<Ellipse.Point> q1 = new Stack<>(); // точки сразу отражаются в остальные 3, но при отрисовке надо рисовать их
+        Stack<Ellipse.Point> q3 = new Stack<>(); // в правильном порядке от ОХ по часовой
         int x = 0;
-        int y = b;  // Y - монотонно убывающая функций при возрастании х, т.е. не можем при изменении х его уменьшить
+        int y = b;
         int D = (b * b - 2 * b * a * a + a * a); // разность квадратов расстояний от центра и дуги до пиксела в диагональном направлении
-        // расстояния до трёх точек
+        // расстояния до трёх точек: диаогональной, горизонтальной, вертикальной
         double d, h, v;
         int x2 = x;
         int y2 = y;
         int alpha = 255;
         while (y >= 0) {
-//            pd.drawMirrorPixels(ell, x, y, color, alpha);
-            q1.push(new Point(ell, x, y, alpha));
-            q2.add(new Point(ell, -x, y, alpha));
-            q3.push(new Point(ell, -x, -y, alpha));
-            q4.add(new Point(ell, x, -y, alpha));
+            q1.push(new Ellipse.Point(ell, x, y, alpha));
+            q2.add(new Ellipse.Point(ell, -x, y, alpha));
+            q3.push(new Ellipse.Point(ell, -x, -y, alpha));
+            q4.add(new Ellipse.Point(ell, x, -y, alpha));
             pd.drawMirrorPixels(ell, x2, y2, color, 255 - alpha);
 
             d = ell.shortestDistance(x + 1, y - 1);
@@ -142,8 +128,10 @@ public class WuDrawer extends BresenhamDrawer {
         pd.drawPixels(q3);
         pd.drawPixels(q4);
         if (from != 0 || to != 360) {
-            drawLine(pd, ell.getX0(), ell.getY0(), ell.getStartX(), ell.getStartY(), color);
-            drawLine(pd, ell.getX0(), ell.getY0(), ell.getEndX(), ell.getEndY(), color);
+            ell.addContour(drawLine(pd, ell.getX0(), ell.getY0(), ell.getStartX(), ell.getStartY(), color));
+            ell.addContour(drawLine(pd, ell.getX0(), ell.getY0(), ell.getEndX(), ell.getEndY(), color));
         }
+        if (fill)
+            ell.fill(pd,new DDALineDrawer());
     }
 }

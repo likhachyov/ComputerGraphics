@@ -1,8 +1,6 @@
 package Interfaces;
 
 import drawers.Ellipse;
-import drawers.WuDrawer;
-
 import java.awt.*;
 import java.util.Queue;
 import java.util.Stack;
@@ -15,6 +13,6 @@ public interface PixelDrawer {
 
     void drawMirrorPixels(Ellipse ell, int x, int y, Color color, int transparency);
 
-    void drawPixels(Stack<WuDrawer.Point> s);
-    void drawPixels(Queue<WuDrawer.Point> q);
+    void drawPixels(Stack<Ellipse.Point> s);
+    void drawPixels(Queue<Ellipse.Point> q);
 }

@@ -1,27 +1,41 @@
 package drawers;
 
+import Interfaces.LineDrawer;
+import Interfaces.PixelDrawer;
+
 import java.awt.*;
+import java.util.*;
 
 public class Ellipse {
 
+    public static class Point implements Comparable {
+        int x, y, alpha;
+        Ellipse ell;
+
+        public Point(Ellipse ell, int x, int y, int alpha) {
+            this.x = x;
+            this.y = y;
+            this.alpha = alpha;
+            this.ell = ell;
+        }
+
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            return Integer.compare(x, ((Point) o).x);
+        }
+    }
+
+    private int x0, y0;
     private int aa, bb;
     private int from, to;
     private int startX, startY, endX, endY;
     private Color color;
-
-    public Color getColor() {
-        return color;
-    }
-
-    public int getX0() {
-        return x0;
-    }
-
-    public int getY0() {
-        return y0;
-    }
-
-    private int x0, y0;
+    private ArrayList<Point> contour = new ArrayList<>();
 
     public Ellipse(int x0, int y0, int a, int b, int from, int to, Color color) {
         if (from < 0 || to > 360)
@@ -33,8 +47,38 @@ public class Ellipse {
         this.color = color;
         aa = a * a;
         bb = b * b;
-        pastRes = from < to;
-//        calcPoints();
+        pastRes = from < to && from != 0;
+    }
+//      для каждого У берём две крайние точки и соединяем линией
+    public void fill(PixelDrawer pd, LineDrawer ld) {
+        HashMap<Integer, TreeSet<Point>> hm = map();
+        hm.forEach((y, tr) -> {
+//            System.out.println(y);
+            int x1 = tr.first().x;
+            int x2 = tr.last().x;
+//            System.out.println("x1 " + x1);
+//            System.out.println("x2 " + x2);
+            ld.drawLine(pd, x1, y, x2, y, color);
+        });
+
+    }
+
+    private HashMap<Integer, TreeSet<Point>> map() {
+        HashMap<Integer, TreeSet<Point>> hm = new HashMap<>();
+        contour.forEach(p -> {
+            if (hm.containsKey(p.y)) {
+                hm.get(p.y).add(p);
+            } else {
+                TreeSet<Point> deq = new TreeSet<>();
+                hm.put(p.y, deq);
+                deq.add(p);
+            }
+        });
+        return hm;
+    }
+
+    void addContour(ArrayList<Point> line) {
+        contour.addAll(line);
     }
 
     private void calcPoints() {
@@ -95,6 +139,8 @@ public class Ellipse {
     private int count = 0; // сколько раз начинали/переставали рисовать точки.
     private boolean pastRes;
 
+    // Если main = true, метод считает, что рисуются точки с бОльшей прозрачностью
+    // count первый раз меняется всегда при начале проверке точек (alpha = 0), второй - когда начали рисовать пай
     public boolean isRange(int x, int y, boolean main) {
         int angle = getAngle(x, y);
         boolean res;
@@ -104,9 +150,6 @@ public class Ellipse {
             res = angle >= from && angle <= to;
         if (main && res != pastRes) { // не учитываем неосновные точки, когда считаем изменения
             count++;
-            System.out.println("A " + angle);
-            System.out.println("x " + x);
-            System.out.println("y " + y);
         }
         if (count == 2) {
             if (!pastRes) {
@@ -117,8 +160,14 @@ public class Ellipse {
                 endY = y;
             }
         }
-        if (main)
+        if (main) {
+//            System.out.println("A " + angle);
+//            System.out.println("x " + x);
+//            System.out.println("y " + y);
             pastRes = res;
+            if (res) // Основные точки заданного диапазона сохраянем
+                contour.add(new Point(x0 + x, y0 + y));
+        }
         return res;
     }
 
@@ -151,22 +200,30 @@ public class Ellipse {
 
     // Не вызывать до конца отрисовки пая!
     public int getStartX() {
-        System.out.println("sx " + startX);
         return x0 + startX;
     }
 
     public int getStartY() {
-        System.out.println("sy " + startY);
         return y0 + startY;
     }
 
     public int getEndX() {
-        System.out.println("ex " + endX);
         return x0 + endX;
     }
 
     public int getEndY() {
-        System.out.println("ey " + endY);
         return y0 + endY;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public int getX0() {
+        return x0;
+    }
+
+    public int getY0() {
+        return y0;
     }
 }

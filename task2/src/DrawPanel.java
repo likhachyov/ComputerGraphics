@@ -1,5 +1,4 @@
 import Interfaces.LineDrawer;
-import Interfaces.OvalDrawer;
 import Interfaces.PixelDrawer;
 import drawers.BresenhamDrawer;
 import drawers.DDALineDrawer;
@@ -18,22 +17,18 @@ public class DrawPanel extends JPanel {
         PixelDrawer pd = new GraphicsPixelDrawer(g2);
         LineDrawer ld;
         ld = new DDALineDrawer();
-        WuDrawer od = new WuDrawer();
+        WuDrawer wd = new WuDrawer();
+        BresenhamDrawer bd = new BresenhamDrawer();
 //        od.drawLine(pd,150, 250, 150, 50, Color.RED);
 //        od.fillPie(pd, 200, 250, 250, 320, 0, 360, new Color(51, 0, 0));
 //        od.drawOval(pd,220,250,200,50, Color.BLACK);
-        od.drawEllipse(220,255,290,200, g2);
+        bd.drawEllipse(220, 255, 290, 200, g2);
 //        ld.drawLine(pd, 150, 100, 150, 200, Color.RED);
 //        ld.drawLine(pd, 150, 150, 221, 221, Color.RED);
 //        ld.drawLine(pd, 50, 150, 250, 150, Color.RED);
-        ld = new WuDrawer();
-//        ld.drawLine(pd,150, 250, 150, 50, Color.GREEN);
-//        ld.drawLine(pd,150, 250, 100, 50, Color.GREEN);
-//        ld.drawLine(pd,150, 250, 10, 400, Color.GREEN);
-//        ld.drawLine(pd,30, 300, 400, 500, Color.GREEN);
-        od = new WuDrawer();
+
 //        od.fillPie(pd,150, 250, 150, 50, 45, 190, Color.GREEN);
-        od.quadrant2(pd, 240, 255, 240, 150, 190, 320,Color.BLACK);
+        wd.drawPie(pd, 240, 255, 200, 50, 199, 265, Color.BLACK, true);
     }
 
 }
