@@ -27,7 +27,7 @@ public class DrawPanel extends JPanel {
 //        wd.drawPie(pd, 240,250, 100, 100, 0, 360, Color.YELLOW, true);
 
 //        wd.drawPie(pd,240,250,299,1,0,360, Color.GREEN, false);
-        wd.drawPie(g2,  390, 350, 500, 250, 90, 0, Color.cyan);
+        wd.drawPie(g2,  540, 350, 500, 250, 60, 40, Color.cyan);
 //        wd.drawEllipse(g2, Color.cyan, 240, 356, 40, 3);
     }
 

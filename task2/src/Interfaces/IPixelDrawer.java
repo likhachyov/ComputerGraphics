@@ -16,5 +16,7 @@ public interface IPixelDrawer {
     void drawPixels(Stack<Ellipse.Point> s);
     void drawPixels(Queue<Ellipse.Point> q);
 
-    void putPixels(int x0, int y0, float x, float y, int from, int to, double curAlpha, int part, Color color);
+    void putPixels(int x0, int y0, double x, double y, int from, int to, double curAlpha, int part, Color color);
+
+    void fill(int x0, int y0, double x, double y, int from, int to, double curAlpha, int part, Color color);
 }

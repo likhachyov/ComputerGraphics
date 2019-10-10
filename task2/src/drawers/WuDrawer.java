@@ -184,7 +184,7 @@ public class WuDrawer {
         while (a * a * truY > b * b * dx) { // Y - сдвиг для доп. точки через OY (над основной)
             curAlpha = Math.toRadians(90) - Math.atan(a * dx / (b * Math.sqrt(a * a - dx * dx)));
             pl.putPixels(x0, y0, dx, truY, from, to, curAlpha, 1, color);
-
+            pl.fill(x0, y0, dx, truY, from, to, curAlpha, 1, color);
             if (delta < 0) {
                 dx++;
                 delta += 4 * b * b * (2 * dx + 3);
@@ -207,7 +207,7 @@ public class WuDrawer {
         while (dy + 1 != 0) { // X - сдвиг для доп. точки через OX
             curAlpha = Math.atan(b * dy / (a * Math.sqrt(b * b - dy * dy)));
             pl.putPixels(x0, y0, truX, dy, from, to, curAlpha, 3, color);
-
+            pl.fill(x0, y0, truX, dy, from, to, curAlpha, 3, color);
             if (delta < 0) {
                 dy--;
                 delta += 4 * a * a * (2 * dy + 3);
@@ -218,7 +218,7 @@ public class WuDrawer {
             }
             truX = (float) ((a / (double) b) * Math.sqrt(b * b - dy * dy));
         }
-        if (from != 0 && to != 360) {
+        if (from != 0 || to != 360) {
             drawLine(pl, x0, y0, x0 + first.x, y0 + first.y, color);
             drawLine(pl, x0, y0, x0 + last.x, y0 + last.y, color);
         }
@@ -226,9 +226,9 @@ public class WuDrawer {
 
     private void initPoint(int a, int b, int alpha, Point p) {
         double k = Math.tan(Math.toRadians(alpha));
-        double x = Math.sqrt(b * b / (k * k + b * b / (double) a / a));
+        double x = Math.sqrt(b * b / (k * k + b * b / (double) a / (double) a));
         int y = (int) Math.floor(Math.abs(k) * x);
-        x = Math.ceil(x);
+        x = Math.floor(x);
         switch (getQuarter(alpha)) {
             case 1: {
                 p.y = y;
