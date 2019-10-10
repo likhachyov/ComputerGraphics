@@ -2,13 +2,13 @@ package drawers;
 
 import Interfaces.LineDrawer;
 import Interfaces.OvalDrawer;
-import Interfaces.PixelDrawer;
+import Interfaces.IPixelDrawer;
 
 import java.awt.*;
 
 public class BresenhamDrawer implements LineDrawer, OvalDrawer {
 
-    public void quadrant(PixelDrawer pd, int x0, int y0, int r, Color color) {
+    public void quadrant(IPixelDrawer pd, int x0, int y0, int r, Color color) {
         // координаты данной фигуры при ее построении с центром в начале координат
         int x = 0;
         int y = r;  // Y - монотонно убывающая функций при возрастании х, т.е. не можем при изменении х его уменшить
@@ -73,7 +73,7 @@ public class BresenhamDrawer implements LineDrawer, OvalDrawer {
         //Вторая часть дуги, если не выполянется условие первого цикла, значит a*a*(2*y - 1) <= 2*b*b*(x + 1)
         while (dy + 1 != 0) {
             fill(x, y, dx, dy, g);
-            //переход по диагонали
+//            переход по диагонали
             if (delta < 0) {
                 dy--;
                 delta += 4 * a * a * (2 * dy + 3);
@@ -87,7 +87,7 @@ public class BresenhamDrawer implements LineDrawer, OvalDrawer {
 
     private void fill(int x, int y, int dx, int dy, Graphics g) {
         //ставим точки в первом квадранте и симметрично в остальных
-        PixelDrawer pd = new GraphicsPixelDrawer((Graphics2D) g);
+        IPixelDrawer pd = new GraphicsPixelDrawer((Graphics2D) g);
         pd.drawPixel(x + dx, y + dy, Color.RED);
         pd.drawPixel(x - dx, y + dy, Color.RED);
         pd.drawPixel(x + dx, y - dy, Color.RED);
@@ -99,7 +99,7 @@ public class BresenhamDrawer implements LineDrawer, OvalDrawer {
     }
 
     @Override
-    public void drawLine(PixelDrawer pd, int x1, int y1, int x2, int y2, Color c) {
+    public void drawLine(IPixelDrawer pd, int x1, int y1, int x2, int y2, Color c) {
         int x = x1;
         int y = y1;
         double dx = Math.abs(x2 - x1);
@@ -120,7 +120,7 @@ public class BresenhamDrawer implements LineDrawer, OvalDrawer {
     }
 
     // Закрашиваемый пай включает в себя построение незакрашиваемого.
-    public void fillPie(PixelDrawer pl, int x0, int y0, int width, int height, int from, int to, Color color) {
+    public void fillPie(IPixelDrawer pl, int x0, int y0, int width, int height, int from, int to, Color color) {
         if (from > to || from < 0 || to > 360)
             throw new IllegalArgumentException();
         if (from <= 90)
@@ -140,7 +140,7 @@ public class BresenhamDrawer implements LineDrawer, OvalDrawer {
      * Метод последовательно смещается по OY и рисует горизонтальные отрезки, пока угол - trueAlpha между OX и
      * линией, проведённой к концу очередного отрезка не равен значению угла 'to'.
      */
-    private void fillPieMod(PixelDrawer pl, int x0, int y0, int width, int height, int from, int to, Color color) {
+    private void fillPieMod(IPixelDrawer pl, int x0, int y0, int width, int height, int from, int to, Color color) {
         int a = width / 2;
         int b = height / 2;
         Double alpha = Math.toRadians(from);  // переводим градусы в радианы
@@ -165,7 +165,7 @@ public class BresenhamDrawer implements LineDrawer, OvalDrawer {
     /**
      * Для второй четверти. Отзеркаливает рисунок с данными значениями в 1-й четверти
      */
-    private void fillPieMod2(PixelDrawer pl, int x0, int y0, int width, int height, int from, int to, Color color) {
+    private void fillPieMod2(IPixelDrawer pl, int x0, int y0, int width, int height, int from, int to, Color color) {
         int a = width / 2;
         int b = height / 2;
         Double alpha = Math.toRadians(from);  // переводим градусы в радианы
@@ -188,7 +188,7 @@ public class BresenhamDrawer implements LineDrawer, OvalDrawer {
     /**
      * Для третьей четверти. Отзеркаливает рисунок с данными значениями во 2-й четверти
      */
-    private void fillPieMod3(PixelDrawer pl, int x0, int y0, int width, int height, int from, int to, Color color) {
+    private void fillPieMod3(IPixelDrawer pl, int x0, int y0, int width, int height, int from, int to, Color color) {
         int a = width / 2;
         int b = height / 2;
         Double alpha = Math.toRadians(from);  // переводим градусы в радианы
@@ -211,7 +211,7 @@ public class BresenhamDrawer implements LineDrawer, OvalDrawer {
     /**
      * Для 4-й четверти. Отзеркаливает рисунок с данными значениями в 3-й четверти
      */
-    private void fillPieMod4(PixelDrawer pl, int x0, int y0, int width, int height, int from, int to, Color color) {
+    private void fillPieMod4(IPixelDrawer pl, int x0, int y0, int width, int height, int from, int to, Color color) {
         int a = width / 2;
         int b = height / 2;
         Double alpha = Math.toRadians(from);  // переводим градусы в радианы
@@ -235,7 +235,7 @@ public class BresenhamDrawer implements LineDrawer, OvalDrawer {
      * Рисуем от ОХ
      */
     @Override
-    public void drawOval(PixelDrawer pd, int x0, int y0, int a, int b, Color c) {
+    public void drawOval(IPixelDrawer pd, int x0, int y0, int a, int b, Color c) {
         int y1 = 0;
         int y2 = 0;
         int x = a;
@@ -258,14 +258,14 @@ public class BresenhamDrawer implements LineDrawer, OvalDrawer {
         }
     }
 
-    private void drawLines(PixelDrawer pd, int x0, int y0, int x1, int y1, int x2, int y2, Color c) {
+    private void drawLines(IPixelDrawer pd, int x0, int y0, int x1, int y1, int x2, int y2, Color c) {
         drawLine(pd, x0 + x1, y0 - y1, x0 + x2, y0 - y2, c);
         drawLine(pd, x0 - x1, y0 - y1, x0 - x2, y0 - y2, c);
         drawLine(pd, x0 + x1, y0 + y1, x0 + x2, y0 + y2, c);
         drawLine(pd, x0 - x1, y0 + y1, x0 - x2, y0 + y2, c);
     }
 
-    private void drawCircle(PixelDrawer pd, int x, int y, int horizontalR, int verticalR, Color c) {
+    private void drawCircle(IPixelDrawer pd, int x, int y, int horizontalR, int verticalR, Color c) {
         int xOffset = 0;  // The offset of coords relative to the center
         int yOffset = verticalR;
         while (xOffset <= yOffset) {

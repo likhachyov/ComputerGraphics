@@ -1,14 +1,14 @@
 package drawers;
 
 import Interfaces.LineDrawer;
-import Interfaces.PixelDrawer;
+import Interfaces.IPixelDrawer;
 
 import java.awt.*;
 
 //digital differential analyzer
 public class DDALineDrawer implements LineDrawer {
     @Override
-    public void drawLine(PixelDrawer pd, int x1, int y1, int x2, int y2, Color c) {
+    public void drawLine(IPixelDrawer pd, int x1, int y1, int x2, int y2, Color c) {
         double dx = x2 - x1;
         double dy = y2 - y1;
         double D = Math.max(Math.abs(dx), Math.abs(dy));

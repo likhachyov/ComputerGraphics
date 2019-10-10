@@ -1,14 +1,13 @@
 package drawers;
 
-import Interfaces.PixelDrawer;
+import Interfaces.IPixelDrawer;
 
 import java.awt.*;
 import java.util.*;
 
 public class WuDrawer {
 
-
-    private ArrayList<Ellipse.Point> drawLine(PixelDrawer pd, int x1, int y1, int x2, int y2, Color c) {
+    private ArrayList<Ellipse.Point> drawLine(IPixelDrawer pd, int x1, int y1, int x2, int y2, Color c) {
         ArrayList<Ellipse.Point> contour = new ArrayList<>();
         int x = x1;
         int y = y1;
@@ -21,7 +20,7 @@ public class WuDrawer {
         int secondY = y + directionY;
         int secondX = x + directionX;
         for (int i = 0; i < (tangent <= 1 ? dx : dy); i++) {
-            if (i == 0){
+            if (i == 0) {
                 pd.drawPixel(x, y, c); // красим первый пиксель
                 contour.add(new Ellipse.Point(x, y));
             }
@@ -52,9 +51,7 @@ public class WuDrawer {
         return contour;
     }
 
-
-
-    public void drawPie(PixelDrawer pd, int x0, int y0, int a, int b, int from, int to, Color color, boolean fill) {
+    public void drawPie(IPixelDrawer pd, int x0, int y0, int a, int b, int from, int to, Color color, boolean fill) {
         Ellipse ell = new Ellipse(x0, y0, a, b, from, to, color);
 
         Queue<Ellipse.Point> q2 = new ArrayDeque<>(); // коллекция для каждой четверти
@@ -132,6 +129,138 @@ public class WuDrawer {
             ell.addContour(drawLine(pd, ell.getX0(), ell.getY0(), ell.getEndX(), ell.getEndY(), color));
         }
         if (fill)
-            ell.fill(pd,new DDALineDrawer());
+            ell.fill(pd, new DDALineDrawer());
     }
+
+    public void drawOval(IPixelDrawer pl, int x0, int y0, int width, int height, Color color) {
+        int a = width / 2;
+        int b = height / 2;
+        int rx = x0 + a;
+        int lx = x0 - a;
+        int ly = 0;
+        int uy = 0;
+        int x = a;
+        while (a * a * (2 * uy - 1) < 2 * b * b * (x + 1)) {
+            uy = (int) Math.ceil(b / (double) a * Math.sqrt(a * a - x * x + x - 0.25)); // порожек в (y;x-1/2)
+            drawLine(pl, x, y0 + uy - 1, x, y0 + ly, color);
+            drawLine(pl, x, y0 + uy - 1, x, y0 + ly, color);
+            drawLine(pl, x, y0 - uy + 1, x, y0 - ly, color);
+            drawLine(pl, x, y0 - uy + 1, x, y0 - ly, color);
+            x--;
+            ly = uy;
+        }
+        for (int y = uy; y <= b; y++) {
+            double step = ((a / (double) b) * Math.sqrt(b * b - y * y + y - 0.25));
+            int newRX = (int) Math.ceil(x0 + step);
+            int newLX = (int) (x0 - step);
+
+            drawLine(pl, rx, y0 + y - 1, newRX, y0 + y, color);
+            drawLine(pl, lx, y0 + y - 1, newLX, y0 + y, color);
+            drawLine(pl, lx, y0 - y + 1, newLX, y0 - y, color);
+            drawLine(pl, rx, y0 - y + 1, newRX, y0 - y, color);
+
+            rx = newRX;
+            lx = newLX;
+        }
+    }
+
+    public void drawPie(Graphics2D g, int x0, int y0, int a, int b, int from, int to, Color color) {
+        int dx = 0;
+        int dy = b;
+        //Рассчитываем координаты точки (x+1; y-1/2)
+        int delta = 4 * b * b * (dx + 1) * (dx + 1) + a * a * (2 * dy - 1) * (2 * dy - 1) - 4 * a * a * b * b;
+        IPixelDrawer pl = new GraphicsPixelDrawer(g);
+        float truX;
+        float truY = b;
+        Double curAlpha = 0.0; // угол в 1-й четверти для текущей точки
+        Point first = new Point();
+        initPoint(a, b, from, first);
+        Point last = new Point();
+        initPoint(a, b, to, last);
+        //Первая часть дуги
+        // При очень маленьком b ( => 0) цикл в "классическом" Брезенхеме останавливается слишком рано
+        // и не дорисовываются горизонтальные точки
+        // поэтому в условии должна быть реальная координата truY
+        while (a * a * truY > b * b * dx) { // Y - сдвиг для доп. точки через OY (над основной)
+            curAlpha = Math.toRadians(90) - Math.atan(a * dx / (b * Math.sqrt(a * a - dx * dx)));
+            pl.putPixels(x0, y0, dx, truY, from, to, curAlpha, 1, color);
+
+            if (delta < 0) {
+                dx++;
+                delta += 4 * b * b * (2 * dx + 3);
+            } else {//переход по диагонали
+                dx++;
+                delta = delta - 8 * a * a * (dy - 1) + 4 * b * b * (2 * dx + 3);
+                if (dy > 1) // чтобы не пропускать точку при 200;20
+                    dy--;
+            }
+            truY = (float) (b / (double) a * Math.sqrt(a * a - dx * dx));
+        }
+        //Рассчитываем координаты точки (x+1/2; y-1)
+        delta = b * b * (2 * dx + 1) * (2 * dx + 1) + 4 * a * a * (dy + 1) * (dy + 1) - 4 * a * a * b * b;
+        dy = (int) Math.max(dy, Math.floor(truY)); // узнаём ординату ближайшей к последней отрисованной точки
+        // рисуем утерянный при переходе пиксел
+        pl.putPixels(x0, y0, dx, truY, from, to, curAlpha, 2, color);
+
+        truX = (float) ((a / (double) b) * Math.sqrt(b * b - dy * dy));
+        //Вторая часть дуги, если не выполянется условие первого цикла, значит Y изменяется быстрее
+        while (dy + 1 != 0) { // X - сдвиг для доп. точки через OX
+            curAlpha = Math.atan(b * dy / (a * Math.sqrt(b * b - dy * dy)));
+            pl.putPixels(x0, y0, truX, dy, from, to, curAlpha, 3, color);
+
+            if (delta < 0) {
+                dy--;
+                delta += 4 * a * a * (2 * dy + 3);
+            } else {//переход по диагонали
+                dy--;
+                delta = delta - 8 * b * b * (dx + 1) + 4 * a * a * (2 * dy + 3);
+                dx++;
+            }
+            truX = (float) ((a / (double) b) * Math.sqrt(b * b - dy * dy));
+        }
+        if (from != 0 && to != 360) {
+            drawLine(pl, x0, y0, x0 + first.x, y0 + first.y, color);
+            drawLine(pl, x0, y0, x0 + last.x, y0 + last.y, color);
+        }
+    }
+
+    private void initPoint(int a, int b, int alpha, Point p) {
+        double k = Math.tan(Math.toRadians(alpha));
+        double x = Math.sqrt(b * b / (k * k + b * b / (double) a / a));
+        int y = (int) Math.floor(Math.abs(k) * x);
+        x = Math.ceil(x);
+        switch (getQuarter(alpha)) {
+            case 1: {
+                p.y = y;
+                p.x = (int) x;
+                break;
+            }
+            case 2: {
+                p.y = y;
+                p.x = (int) -x;
+                break;
+            }
+            case 3: {
+                p.y = -y;
+                p.x = (int) -x;
+                break;
+            }
+            case 4: {
+                p.y = -y;
+                p.x = (int) x;
+                break;
+            }
+        }
+    }
+
+    private int getQuarter(int angle) {
+        if (angle >= 0 && angle <= 90)
+            return 1;
+        if (angle > 90 && angle <= 180)
+            return 2;
+        if (angle > 180 && angle <= 270)
+            return 3;
+        return 4;
+    }
+
 }

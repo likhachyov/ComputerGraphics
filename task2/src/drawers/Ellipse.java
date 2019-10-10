@@ -1,7 +1,7 @@
 package drawers;
 
 import Interfaces.LineDrawer;
-import Interfaces.PixelDrawer;
+import Interfaces.IPixelDrawer;
 
 import java.awt.*;
 import java.util.*;
@@ -50,7 +50,7 @@ public class Ellipse {
         pastRes = from < to && from != 0;
     }
 //      для каждого У берём две крайние точки и соединяем линией
-    public void fill(PixelDrawer pd, LineDrawer ld) {
+    public void fill(IPixelDrawer pd, LineDrawer ld) {
         HashMap<Integer, TreeSet<Point>> hm = map();
         hm.forEach((y, tr) -> {
 //            System.out.println(y);
@@ -197,6 +197,8 @@ public class Ellipse {
             return 3;
         return 4;
     }
+
+
 
     // Не вызывать до конца отрисовки пая!
     public int getStartX() {
