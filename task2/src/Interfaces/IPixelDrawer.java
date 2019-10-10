@@ -9,7 +9,7 @@ public interface IPixelDrawer {
 
     void drawPixel(int x, int y, Color c);
 
-    void drawPixel(int x, int y, Color c, int transparency);
+    void drawPixel(int x, int y, int transparency, Color c);
 
     void drawMirrorPixels(Ellipse ell, int x, int y, Color color, int transparency);
 
@@ -18,5 +18,5 @@ public interface IPixelDrawer {
 
     void putPixels(int x0, int y0, double x, double y, int from, int to, double curAlpha, int part, Color color);
 
-    void fill(int x0, int y0, double x, double y, int from, int to, double curAlpha, int part, Color color);
+    void fill(int x0, int y0, double x, double y, int from, int to, double curAlpha, Color color);
 }

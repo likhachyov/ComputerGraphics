@@ -33,8 +33,8 @@ public class WuDrawer {
                     error -= 1;
                 }
 //                System.out.println(" WX " + x);
-                pd.drawPixel(x, y, c, (int) (255 * (1 - error))); // основную точку рисуем с прозрачностью 1- error
-                pd.drawPixel(x, secondY, c, (int) (255 * error));// вторую с прозрачностью равной error
+                pd.drawPixel(x, y, (int) (255 * (1 - error)),c); // основную точку рисуем с прозрачностью 1- error
+                pd.drawPixel(x, secondY, (int) (255 * error),c);// вторую с прозрачностью равной error
             } else { // если быстрее растет У
                 y += directionY;
                 error += 1 / tangent;
@@ -43,8 +43,8 @@ public class WuDrawer {
                     secondX += directionX;
                     error -= 1;
                 }
-                pd.drawPixel(x, y, c, (int) (255 * (1 - error))); // основную точку рисуем с прозрачностью 1- error
-                pd.drawPixel(secondX, y, c, (int) (255 * error));// вторую с прозрачностью равной error
+                pd.drawPixel(x, y, (int) (255 * (1 - error)), c); // основную точку рисуем с прозрачностью 1- error
+                pd.drawPixel(secondX, y, (int) (255 * error),c);// вторую с прозрачностью равной error
             }
             contour.add(new Ellipse.Point(x, y));
         }
@@ -164,7 +164,87 @@ public class WuDrawer {
         }
     }
 
-    public void drawPie(Graphics2D g, int x0, int y0, int a, int b, int from, int to, Color color) {
+    private static double floatPart(float x) {
+        while (x >= 0)
+            x--;
+        x++;
+        return x;
+    }
+
+
+    public void fillOval(IPixelDrawer pl, int x0, int y0, int width, int height, Color color) {  // fixme now only drawing oval
+        int a = width / 2;
+        int b = height / 2;
+        int dx = 0;
+        int dy = b;
+        //Рассчитываем координаты точки (x+1; y-1/2)
+        int d = 4 * b * b * (dx + 1) * (dx + 1) + a * a * (2 * dy - 1) * (2 * dy - 1) - 4 * a * a * b * b;
+        float stepX;
+        float stepY = b;
+        //Первая часть дуги
+        while (a * a * stepY > b * b * dx) { // Y - сдвиг для доп. точки через OY (над основной)
+            drawLine(pl, x0 + dx, y0 + (int) (stepY), x0 - dx, y0 + (int) (stepY), color);
+            pl.drawPixel(x0 + dx, y0 + (int) (stepY) + 1, (int) (floatPart(stepY) * 255), color);
+            pl.drawPixel(x0 + dx, y0 + (int) (stepY), 255-(int) (floatPart(stepY) * 255), color);
+            pl.drawPixel(x0 - dx, y0 + (int) (stepY) + 1, (int) (floatPart(stepY) * 255), color);
+            pl.drawPixel(x0 - dx, y0 + (int) (stepY) , 255-(int) (floatPart(stepY) * 255), color);
+
+            drawLine(pl, x0 - dx, y0 - (int) (stepY), x0 + dx, y0 - (int) (stepY), color);
+            pl.drawPixel(x0 - dx, y0 - (int) (stepY) - 1, (int) (floatPart(stepY) * 255), color);
+            pl.drawPixel(x0 - dx, y0 - (int) (stepY) , 255-(int) (floatPart(stepY) * 255), color);
+            pl.drawPixel(x0 + dx, y0 - (int) (stepY) - 1, (int) (floatPart(stepY) * 255), color);
+            pl.drawPixel(x0 + dx, y0 - (int) (stepY) , 255-(int) (floatPart(stepY) * 255), color);
+
+            if (d < 0) {
+                dx++;
+                d += 4 * b * b * (2 * dx + 3);
+            } else {//переход по диагонали
+                dx++;
+                d = d - 8 * a * a * (dy - 1) + 4 * b * b * (2 * dx + 3);
+                if (dy > 1) // чтобы не пропускать точку при 200;20
+                    dy--;
+            }
+            stepY = (float) (b / (double) a * Math.sqrt(a * a - dx * dx));
+        }
+        //Рассчитываем координаты точки (x+1/2; y-1)
+        d = b * b * (2 * dx + 1) * (2 * dx + 1) + 4 * a * a * (dy + 1) * (dy + 1) - 4 * a * a * b * b;
+        dy = (int) Math.max(dy, Math.floor(stepY)); // узнаём ординату ближайшей к последней отрисованной точки
+        // рисуем утерянный при переходе пиксел
+        pl.drawPixel(x0 + dx, y0 + (int) (stepY + 1), (int) (floatPart(stepY) * 255), color);
+        pl.drawPixel(x0 - dx, y0 + (int) (stepY + 1), (int) (floatPart(stepY) * 255), color);
+        pl.drawPixel(x0 - dx, y0 - (int) (stepY + 1), (int) (floatPart(stepY) * 255), color);
+        pl.drawPixel(x0 + dx, y0 - (int) (stepY + 1), (int) (floatPart(stepY) * 255), color);
+//        pl.drawPixel(x0, y0 + b, (int) (floatPart(stepY) * 255), color);
+//        pl.drawPixel(x0, y0 - b, (int) (floatPart(stepY) * 255), color);
+
+        stepX = (float) ((a / (double) b) * Math.sqrt(b * b - dy * dy));
+        //Вторая часть дуги, если не выполянется условие первого цикла, значит Y изменяется быстрее
+        while (dy + 1 != 0) { // X - сдвиг для доп. точки через OX
+            drawLine(pl, x0 + (int) (stepX), y0 + dy, x0 - (int) (stepX), y0 + dy, color);
+            pl.drawPixel(x0 + (int) (stepX) + 1, y0 + dy, (int) (floatPart(stepX) * 255), color);
+            pl.drawPixel(x0 + (int) (stepX) , y0 + dy, 255-(int) (floatPart(stepX) * 255), color);
+            pl.drawPixel(x0 - (int) (stepX) - 1, y0 + dy,  (int) (floatPart(stepX) * 255), color);
+            pl.drawPixel(x0 - (int) (stepX) , y0 + dy,  255-(int) (floatPart(stepX) * 255), color);
+
+            drawLine(pl, x0 - (int) (stepX), y0 - dy, x0 + (int) (stepX), y0 - dy, color);
+            pl.drawPixel(x0 - (int) (stepX) - 1, y0 - dy, (int) (floatPart(stepX) * 255), color);
+            pl.drawPixel(x0 - (int) (stepX) , y0 - dy, 255-(int) (floatPart(stepX) * 255), color);
+            pl.drawPixel(x0 + (int) (stepX) + 1, y0 - dy, (int) (floatPart(stepX) * 255), color);
+            pl.drawPixel(x0 + (int) (stepX) , y0 - dy, 255-(int) (floatPart(stepX) * 255), color);
+
+            if (d < 0) {
+                dy--;
+                d += 4 * a * a * (2 * dy + 3);
+            } else {//переход по диагонали
+                dy--;
+                d = d - 8 * b * b * (dx + 1) + 4 * a * a * (2 * dy + 3);
+                dx++;
+            }
+            stepX = (float) ((a / (double) b) * Math.sqrt(b * b - dy * dy));
+        }
+    }
+
+    public void drawPie(Graphics2D g, int x0, int y0, int a, int b, int from, int to, Color color, boolean fill) {
         int dx = 0;
         int dy = b;
         //Рассчитываем координаты точки (x+1; y-1/2)
@@ -184,7 +264,8 @@ public class WuDrawer {
         while (a * a * truY > b * b * dx) { // Y - сдвиг для доп. точки через OY (над основной)
             curAlpha = Math.toRadians(90) - Math.atan(a * dx / (b * Math.sqrt(a * a - dx * dx)));
             pl.putPixels(x0, y0, dx, truY, from, to, curAlpha, 1, color);
-            pl.fill(x0, y0, dx, truY, from, to, curAlpha, 1, color);
+            if (fill)
+            pl.fill(x0, y0, dx, truY, from, to, curAlpha,  color);
             if (delta < 0) {
                 dx++;
                 delta += 4 * b * b * (2 * dx + 3);
@@ -207,7 +288,8 @@ public class WuDrawer {
         while (dy + 1 != 0) { // X - сдвиг для доп. точки через OX
             curAlpha = Math.atan(b * dy / (a * Math.sqrt(b * b - dy * dy)));
             pl.putPixels(x0, y0, truX, dy, from, to, curAlpha, 3, color);
-            pl.fill(x0, y0, truX, dy, from, to, curAlpha, 3, color);
+            if (fill)
+            pl.fill(x0, y0, truX, dy, from, to, curAlpha,  color);
             if (delta < 0) {
                 dy--;
                 delta += 4 * a * a * (2 * dy + 3);
