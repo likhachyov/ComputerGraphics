@@ -33,8 +33,8 @@ public class WuDrawer {
                     error -= 1;
                 }
 //                System.out.println(" WX " + x);
-                pd.drawPixel(x, y, (int) (255 * (1 - error)),c); // основную точку рисуем с прозрачностью 1- error
-                pd.drawPixel(x, secondY, (int) (255 * error),c);// вторую с прозрачностью равной error
+                pd.drawPixel(x, y, (int) (255 * (1 - error)), c); // основную точку рисуем с прозрачностью 1- error
+                pd.drawPixel(x, secondY, (int) (255 * error), c);// вторую с прозрачностью равной error
             } else { // если быстрее растет У
                 y += directionY;
                 error += 1 / tangent;
@@ -44,7 +44,7 @@ public class WuDrawer {
                     error -= 1;
                 }
                 pd.drawPixel(x, y, (int) (255 * (1 - error)), c); // основную точку рисуем с прозрачностью 1- error
-                pd.drawPixel(secondX, y, (int) (255 * error),c);// вторую с прозрачностью равной error
+                pd.drawPixel(secondX, y, (int) (255 * error), c);// вторую с прозрачностью равной error
             }
             contour.add(new Ellipse.Point(x, y));
         }
@@ -185,15 +185,15 @@ public class WuDrawer {
         while (a * a * stepY > b * b * dx) { // Y - сдвиг для доп. точки через OY (над основной)
             drawLine(pl, x0 + dx, y0 + (int) (stepY), x0 - dx, y0 + (int) (stepY), color);
             pl.drawPixel(x0 + dx, y0 + (int) (stepY) + 1, (int) (floatPart(stepY) * 255), color);
-            pl.drawPixel(x0 + dx, y0 + (int) (stepY), 255-(int) (floatPart(stepY) * 255), color);
+            pl.drawPixel(x0 + dx, y0 + (int) (stepY), 255 - (int) (floatPart(stepY) * 255), color);
             pl.drawPixel(x0 - dx, y0 + (int) (stepY) + 1, (int) (floatPart(stepY) * 255), color);
-            pl.drawPixel(x0 - dx, y0 + (int) (stepY) , 255-(int) (floatPart(stepY) * 255), color);
+            pl.drawPixel(x0 - dx, y0 + (int) (stepY), 255 - (int) (floatPart(stepY) * 255), color);
 
             drawLine(pl, x0 - dx, y0 - (int) (stepY), x0 + dx, y0 - (int) (stepY), color);
             pl.drawPixel(x0 - dx, y0 - (int) (stepY) - 1, (int) (floatPart(stepY) * 255), color);
-            pl.drawPixel(x0 - dx, y0 - (int) (stepY) , 255-(int) (floatPart(stepY) * 255), color);
+            pl.drawPixel(x0 - dx, y0 - (int) (stepY), 255 - (int) (floatPart(stepY) * 255), color);
             pl.drawPixel(x0 + dx, y0 - (int) (stepY) - 1, (int) (floatPart(stepY) * 255), color);
-            pl.drawPixel(x0 + dx, y0 - (int) (stepY) , 255-(int) (floatPart(stepY) * 255), color);
+            pl.drawPixel(x0 + dx, y0 - (int) (stepY), 255 - (int) (floatPart(stepY) * 255), color);
 
             if (d < 0) {
                 dx++;
@@ -222,15 +222,15 @@ public class WuDrawer {
         while (dy + 1 != 0) { // X - сдвиг для доп. точки через OX
             drawLine(pl, x0 + (int) (stepX), y0 + dy, x0 - (int) (stepX), y0 + dy, color);
             pl.drawPixel(x0 + (int) (stepX) + 1, y0 + dy, (int) (floatPart(stepX) * 255), color);
-            pl.drawPixel(x0 + (int) (stepX) , y0 + dy, 255-(int) (floatPart(stepX) * 255), color);
-            pl.drawPixel(x0 - (int) (stepX) - 1, y0 + dy,  (int) (floatPart(stepX) * 255), color);
-            pl.drawPixel(x0 - (int) (stepX) , y0 + dy,  255-(int) (floatPart(stepX) * 255), color);
+            pl.drawPixel(x0 + (int) (stepX), y0 + dy, 255 - (int) (floatPart(stepX) * 255), color);
+            pl.drawPixel(x0 - (int) (stepX) - 1, y0 + dy, (int) (floatPart(stepX) * 255), color);
+            pl.drawPixel(x0 - (int) (stepX), y0 + dy, 255 - (int) (floatPart(stepX) * 255), color);
 
             drawLine(pl, x0 - (int) (stepX), y0 - dy, x0 + (int) (stepX), y0 - dy, color);
             pl.drawPixel(x0 - (int) (stepX) - 1, y0 - dy, (int) (floatPart(stepX) * 255), color);
-            pl.drawPixel(x0 - (int) (stepX) , y0 - dy, 255-(int) (floatPart(stepX) * 255), color);
+            pl.drawPixel(x0 - (int) (stepX), y0 - dy, 255 - (int) (floatPart(stepX) * 255), color);
             pl.drawPixel(x0 + (int) (stepX) + 1, y0 - dy, (int) (floatPart(stepX) * 255), color);
-            pl.drawPixel(x0 + (int) (stepX) , y0 - dy, 255-(int) (floatPart(stepX) * 255), color);
+            pl.drawPixel(x0 + (int) (stepX), y0 - dy, 255 - (int) (floatPart(stepX) * 255), color);
 
             if (d < 0) {
                 dy--;
@@ -265,7 +265,7 @@ public class WuDrawer {
             curAlpha = Math.toRadians(90) - Math.atan(a * dx / (b * Math.sqrt(a * a - dx * dx)));
             pl.putPixels(x0, y0, dx, truY, from, to, curAlpha, 1, color);
             if (fill)
-            pl.fill(x0, y0, dx, truY, from, to, curAlpha,  color);
+                pl.fill(x0, y0, dx, truY, from, to, curAlpha, color);
             if (delta < 0) {
                 dx++;
                 delta += 4 * b * b * (2 * dx + 3);
@@ -289,7 +289,7 @@ public class WuDrawer {
             curAlpha = Math.atan(b * dy / (a * Math.sqrt(b * b - dy * dy)));
             pl.putPixels(x0, y0, truX, dy, from, to, curAlpha, 3, color);
             if (fill)
-            pl.fill(x0, y0, truX, dy, from, to, curAlpha,  color);
+                pl.fill(x0, y0, truX, dy, from, to, curAlpha, color);
             if (delta < 0) {
                 dy--;
                 delta += 4 * a * a * (2 * dy + 3);

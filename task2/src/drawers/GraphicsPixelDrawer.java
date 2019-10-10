@@ -84,7 +84,6 @@ public class GraphicsPixelDrawer implements IPixelDrawer {
                     secondY += directionY;
                     error -= 1;
                 }
-//                System.out.println(" WX " + x);
                 pd.drawPixel(x, y, (int) (255 * (1 - error)), c); // основную точку рисуем с прозрачностью 1- error
                 pd.drawPixel(x, secondY, (int) (255 * error), c);// вторую с прозрачностью равной error
             } else { // если быстрее растет У
@@ -106,7 +105,6 @@ public class GraphicsPixelDrawer implements IPixelDrawer {
     @Override
     public void putPixels(int x0, int y0, double x, double y, int from, int to, double alpha, int part, Color color) {
         alpha = Math.toDegrees(alpha);
-        double x1, x2;
         switch (part) {
             //Первая часть дуги
             case 1: {
@@ -298,10 +296,7 @@ public class GraphicsPixelDrawer implements IPixelDrawer {
 
     // Находим Х на контуре пая через тангенс
     private double getX(int y, int alpha) {
-
         return y / Math.tan(Math.toRadians(alpha));
-
-
     }
 
     private boolean isQuarter(int from, int to, double alpha, int q) {
