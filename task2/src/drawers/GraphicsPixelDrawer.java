@@ -157,6 +157,8 @@ public class GraphicsPixelDrawer implements IPixelDrawer {
                     putPixel(g, color, x0 - IPart(x) - 1, (int) (y0 - y), (int) (FPart(x) * 255));
                 }//IV квадрант
                 if (isQuarter(from, to, alpha, 4)) {
+//                    System.out.println("YX " +x);
+//                    System.out.println("YY " +y);
                     putPixel(g, color, x0 + IPart(x), (int) (y0 - y), 255 - (int) (FPart(x) * 255));
                     putPixel(g, color, x0 + IPart(x) + 1, (int) (y0 - y), (int) (FPart(x) * 255));
                 }
@@ -208,7 +210,7 @@ public class GraphicsPixelDrawer implements IPixelDrawer {
             if (isQuarter(from, to, alpha, 4)) {
                 x1 = from > 270 ? getX(iy, 360 - from) : 0; // если линия from в этой четверти, рисуем к ней, иначе к OY
                 drawLine(this, (int) (x0 + x1), y0 - iy, (int) (x0 + x), y0 - iy, color);
-            } else if (to < 360 && alpha < 360 - from) { //линия не доходит до контура
+            } else if (to < 360 && to > 270 && alpha < 360 - from) { //линия не доходит до контура
                 x1 = getX(iy, 360 - to); // point on на прямой to
                 x2 = from > 270 ? getX(iy, 360 - from) : 0; // точка на прямой from
                 drawLine(this, (int) (x0 + x1), y0 - iy, x0 + IPart(x2), y0 - iy, color);
@@ -235,9 +237,9 @@ public class GraphicsPixelDrawer implements IPixelDrawer {
             }
             //II квадрант
             if (isQuarter(from, to, alpha, 2)) {
-                if (to >= 180) { // вся четверть входит
+                if (to >= 180|| to < 90 && from < 90) { // вся четверть входит
                     drawLine(this, x0, y0 + iy, (int) (x0 - x), y0 + iy, color);
-                } else if (from < 180 && alpha < 180 - from) {
+                } else if (from < 180 && from > 90 && alpha < 180 - from) {
                     x2 = getX(iy, 180 - from); // рисуем от from до OY
                     drawLine(this, (int) (x0 - x2), y0 + iy, (int) (x0 - x), y0 + iy, color);
                     if (to > 90) { // рисуем от to до контура
@@ -314,6 +316,7 @@ public class GraphicsPixelDrawer implements IPixelDrawer {
                         to < from && !(180 + alpha > to && 180 + alpha < from);
             }
             case 4: {
+
                 return from < to && to > 270 && 360 - alpha >= from && 360 - alpha <= to ||
                         to < from && !(360 - alpha > to && 360 - alpha < from);
             }

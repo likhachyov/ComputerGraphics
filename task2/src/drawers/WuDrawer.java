@@ -7,7 +7,7 @@ import java.util.*;
 
 public class WuDrawer {
 
-    private ArrayList<Ellipse.Point> drawLine(IPixelDrawer pd, int x1, int y1, int x2, int y2, Color c) {
+    public ArrayList<Ellipse.Point> drawLine(IPixelDrawer pd, int x1, int y1, int x2, int y2, Color c) {
         ArrayList<Ellipse.Point> contour = new ArrayList<>();
         int x = x1;
         int y = y1;
@@ -32,7 +32,6 @@ public class WuDrawer {
                     secondY += directionY;
                     error -= 1;
                 }
-//                System.out.println(" WX " + x);
                 pd.drawPixel(x, y, (int) (255 * (1 - error)), c); // основную точку рисуем с прозрачностью 1- error
                 pd.drawPixel(x, secondY, (int) (255 * error), c);// вторую с прозрачностью равной error
             } else { // если быстрее растет У
@@ -282,7 +281,6 @@ public class WuDrawer {
         dy = (int) Math.max(dy, Math.floor(truY)); // узнаём ординату ближайшей к последней отрисованной точки
         // рисуем утерянный при переходе пиксел
         pl.putPixels(x0, y0, dx, truY, from, to, curAlpha, 2, color);
-
         truX = (float) ((a / (double) b) * Math.sqrt(b * b - dy * dy));
         //Вторая часть дуги, если не выполянется условие первого цикла, значит Y изменяется быстрее
         while (dy + 1 != 0) { // X - сдвиг для доп. точки через OX
